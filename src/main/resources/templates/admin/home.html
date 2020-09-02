@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <title>Stable matching and visualization.</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/materialdesignicons.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.min.css}" rel="stylesheet">
+    <!--<link href="../../static/css/bootstrap.min.css" rel="stylesheet">-->
+    <!--<link href="../../static/css/materialdesignicons.min.css" rel="stylesheet">-->
+    <!--<link href="../../static/css/style.min.css" rel="stylesheet">-->
+    <style type="text/css">
+        h3{
+            color:white;
+            text-align: center;
+            height: 80px;
+            line-height: 80px;
+        }
+        .rowItem{
+            display: inline-block;
+            font-weight: bolder;
+            font-size: 32px;
+            height: 54px;
+            line-height: 54px;
+            border-radius: 4px;
+            background-color: #65bdf8;
+            width: 50%;
+        }
+        .rowItem a{
+            color: white;
+        }
+        li .label{
+            font-size: 14px;
+        }
+        .suggest-content{
+            margin-top: 6px;
+            text-indent: 2em;
+            font-size: 16px;
+            line-height: 22px;
+        }
+        .big-input{
+            width: 340px !important;
+            border-radius: 4px !important;
+        }
+    </style>
+</head>
+
+<body style="background-image: url(./images/GS.jpg); background-size: cover;">
+<div class="container">
+    <h3>Stable matching and visualization</h3>
+    <div class="row" style="height: 20vh;">
+        <div class="col-lg-2 col-sm-2">&nbsp;</div>
+        <div class="col-lg-8 col-sm-8" align="center">
+            <form class="form-inline">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control big-input" id="matchName" placeholder="search content">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-info" style="padding: 2px 8px;border-radius: 20px;margin-left: 14px;" onclick="doSearch();"><span style="font-size: 24px;" class="mdi mdi-search-web"></span></button>
+            </form>
+        </div>
+        <div class="col-lg-2 col-sm-2">&nbsp;</div>
+    </div>
+    <div class="row" style="height: 50vh;">
+        <div class="col-lg-2 col-sm-2">&nbsp;</div>
+        <div class="col-lg-4 col-sm-4" align="center">
+            <p id="gsRow" class="rowItem"><a href="./gsHome">GS Match</a></p>
+        </div>
+        <div class="col-lg-4 col-sm-4" align="center">
+            <p id="egsRow" class="rowItem"><a href="./egsHome">EGS Match</a></p>
+        </div>
+        <div class="col-lg-2 col-sm-2">&nbsp;</div>
+    </div>
+    <div class="row" style="height: 10vh;">
+        <div class="col-lg-2 col-sm-2">&nbsp;</div>
+        <div class="col-lg-8 col-sm-8" align="center">
+            <button type="button" class="btn btn-info" onclick="showMatchAlg();">Matching algorithm</button>
+            <button type="button" class="btn btn-info" onclick="showSuggest();">Suggest</button>
+            <button type="button" class="btn btn-info" onclick="showAllSuggest();">All Suggest</button>
+            <button type="button" class="btn btn-info" onclick="showPlan();">Future plan</button>
+        </div>
+        <div class="col-lg-2 col-sm-2">&nbsp;</div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="matchModal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Stable Marriage problem (GS and EGS algorithm)</h4>
+            </div>
+            <div class="modal-body">
+                <p>The Stable/Marriage (SM) problem is a dichotomy matching problem between a group of n men and women, each of whom has a strictly-ordered preference list ranking all the members of the opposite set. The goal is to find a stable matching between the men and women, i.e., a pairing of each man to a woman in such a way that no man and woman who are not assigned to each other would rather be assigned to each other than accept their current assignment.</p>
+                <p>In 1962, Gale and Shapley described a polynomial-time algorithm to find a stable matching given an instance of SM. This algorithm is popularly known as the Gale-Shapley (GS) algorithm. Subsequently, Gusfield and Irving extended the GS algorithm, in order to reduce the number of operations. The extended algorithm is known as the EGS algorithm. This web application illustrates the execution of both the GS and EGS algorithm on a given instance of SM.</p>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" tabindex="-1" id="suggestModal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Suggest</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <textarea id="suggestContent" class="form-control" rows="3" placeholder="Input you suggest">
+
+                    </textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" onclick="sendSuggest()">Send suggest</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" tabindex="-1" id="planModal" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Future plan</h4>
+            </div>
+            <div class="modal-body">
+                <p>There are many extensions to the stable matching problem, such as the hospital/resident(HR) problem, student project allocation(SPA) problem, and kidney allocation problems. Therefore, the future plan of this application is to realize more extensions and branches of stable matching algorithms and visualize them. For example, add HR algorithm, SPA algorithm, etc.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" tabindex="-1" id="allSuggestModal" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">All Suggest</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="height: 60vh">
+                    <ul class="list-group" id="allSuggestList">
+
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div style="text-align:center">
+    <p><strong style="color:white">*Attention 1 *:Due to data storage reasons, the maximum number of people running the algorithm is 20. It is recommended that you enter the number of people within 10. More than 10 people will cause the running time to be too long.</strong></p>
+    <p><strong style="color:white">*Attention 2 *:The application does not perform page adaptation processing, so the mobile terminal and shrinking the window will cause the page function to move.</strong></p>
+</div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/perfect-scrollbar.min.js}"></script>
+<script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+<script type="text/javascript" th:src="@{/js/base.js}"></script>
+<script type="text/javascript">
+    function doSearch(){
+        $(".rowItem").hide();
+        $("#"+$("#matchName").val()+"Row").show();
+    }
+    function openUserDetail(_userId) {
+        layer.open({
+            type: 2,
+            title: "edit information",
+            maxmin: true,
+            area: ['80%', '90%'],
+            content: "./user/openGrxx.do?userId=" + _userId,
+            end: function () {
+                location.reload();
+            }
+        });
+    }
+    function showPlan() {
+        $('#planModal').modal('toggle')
+    }
+
+    function showSuggest(){
+        $("#suggestContent").val("");
+        $('#suggestModal').modal('toggle')
+    }
+    function showMatchAlg(){
+        $('#matchModal').modal('toggle')
+    }
+    function showAllSuggest(){
+        layer.load(0)
+        ajaxGet("./getAllSuggest.do", function (ret) {
+            layer.closeAll("loading");
+            var suggestArrStr="";
+            var suggestArr=ret.data;
+            for(var i in suggestArr){
+                suggestArrStr+="<li class=\"list-group-item\"><span class=\"label label-success\">"+formatDate(suggestArr[i].time)+"</span><br><p class='suggest-content'>"+suggestArr[i].content+"</p></li>";
+            }
+            $("#allSuggestList").html(suggestArrStr);
+            $('#allSuggestModal').modal('toggle')
+        });
+    }
+    function sendSuggest(){
+        layer.load(0)
+        ajaxPost("./saveSuggest.do", {suggest: $("#suggestContent").val()}, function (ret) {
+            layer.closeAll("loading");
+            layer.msg("success");
+            $('#suggestModal').modal('toggle')
+        });
+    }
+</script>
+</body>
+</html>
